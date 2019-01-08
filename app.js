@@ -33,6 +33,9 @@ app.set('view engine', 'ejs');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
+var db_room = require('./models/db_room');
+
+
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -43,6 +46,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
+//========================================================================================
 
 
 
@@ -53,37 +57,39 @@ app.use('/users', usersRouter);
 
 
 
-
-
-
-
-
-
-
-
-
-
-var io = socketio.listen(server);
+var userrooms = [];
 
 io.sockets.on('connect', function(socket){
 	//var roomId = "";
 	
-	
-	var userroom = {
+/*	var userroom = {
 			userid: string,
 			roomname: string,
 			roompass: string,
 			roommaxp: int,
 			roomcurp: int
-	}
-	
-	var userrooms = [];
+	}*/
 	
 	
 	
 	socket.on('join', function(data){
-		socket.join(data);
-		roomId = data;
+		console.log('data at join : '+data);
+		
+		for(var item in userrooms){
+			
+			if(userrooms[item].roomname == data){
+				if(userrooms[item].roomcurp >=10){
+					return;
+				}else{
+					userrooms[item].roomcurp += 1;
+					console.log(userrooms[item].roomcurp);
+					
+					socket.join(data);
+					roomId = data;
+				}
+			}
+		}
+		
 	});
 	
 	socket.on('draw', function(data){
@@ -91,39 +97,53 @@ io.sockets.on('connect', function(socket){
 	});
 	
 	socket.on('onCreateRoom', function(data){
+		console.log('on server onCreateRoom')
+		
+		
+		
 		var roomexist = false;
-		for(var item in userrooms){
+/*		for(var item in userrooms){
 			if(data.roomname == userrooms[item].roomname){
 				roomexist = true;
 			}
-		}
+		}*/
+		
+		db_room.existCheck(data.roomname, function(row){
+			roomexist = row;
+		})
 		
 		if(!roomexist){
 			socket.leave(socket.room);
-			socket.join(data.roomname);
+			//socket.join(data.roomname);
 			socket.room = data.roomname;
 			data.rcode = 0;
 			
-			userrooms.push({
-				userid: data.userid,
-				usernick: data.usernick,
-				roomname: data.roomname,
-				roompass: data.roompass,
-				roommaxp: data.roommaxp,
-				roomcurp: 1
+			var room = {
+					userid: data.userid,
+					roomname: data.roomname,
+					roompass: data.roompass,
+					roommaxp: data.roommaxp,
+					roomcurp: 0
+				};
+			
+			db_room.createRoom(room, function(row){
+				console.log(row);
 			});
+			
 		}else{
 			data.rcode = 1;
 		}
-		socket.emit('onCreateRoom',data)
 		
+		if(data.rcode == 0){
+			console.log(data);
+		socket.emit('onCreateRoom', data)
+		}else{
+			console.log('기존 방있음');
+		}
 	});
 	
+	
 })
-
-
-
-
 
 
 
