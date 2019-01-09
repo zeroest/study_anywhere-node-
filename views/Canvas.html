@@ -19,8 +19,55 @@ canvas {
 	box-shadow: 1px 1px 20px #ccc;
 }
 </style>
-    
-  <script>
+
+<!-- <script type="text/javascript">
+    	// 뒤로가기 버튼 방지 
+ 
+		var killBackSpace = function(e) {
+		e = e ? e : window.event;
+		var t = e.target ? e.target : e.srcElement ? e.srcElement : null;
+		if (t
+				&& t.tagName
+				&& (t.type && /(password)|(text)|(file)/.test(t.type
+						.toLowerCase()))
+				|| t.tagName.toLowerCase() == 'textarea') {
+			return true;
+		}
+		var k = e.keyCode ? e.keyCode : e.which ? e.which : null;
+		if (k == 8) {
+			if (e.preventDefault) {
+				e.preventDefault();
+			}
+			return false;
+		}
+		return true;
+	};
+	if (typeof document.addEventListener != 'undefined') {
+		document.addEventListener('keydown', killBackSpace, false);
+	} else if (typeof document.attachEvent != 'undefined') {
+		document.attachEvent('onkeydown', killBackSpace);
+	} else {
+		if (document.onkeydown != null) {
+			var oldOnkeydown = document.onkeydown;
+			document.onkeydown = function(e) {
+				oldOnkeydown(e);
+				killBackSpace(e);
+			};
+		} else {
+			document.onkeydown = killBackSpace;
+		}
+	}
+</script>
+
+<script type="text/javascript">
+	history.pushState(null, document.title, location.href);
+	window.addEventListener('popstate', function(event) {
+		history.pushState(null, document.title, location.href);
+	});
+</script> -->
+
+
+<script>
       // Point 생성자 함수를 생성합니다.
       function Point(event, target) {
           this.x = event.pageX - $(target).position().left;
@@ -30,6 +77,7 @@ canvas {
     <script>
     
         $(document).ready(function () {
+        	console.log('<%= room %>');
             // Canvas 객체를 추출합니다.
             var canvas = document.getElementById('canvas');
             var context = canvas.getContext('2d');
@@ -73,7 +121,6 @@ canvas {
 
             // 소켓 이벤트를 연결합니다.
             var socket = io.connect();
-            socket.emit('join', '<%= room %>');
             socket.on('line', function (data) {
                 context.lineWidth = data.width;
                 context.strokeStyle = data.color;
