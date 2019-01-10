@@ -52,6 +52,7 @@ router.post('/identify', function(req, res){
 
 router.get('/', function(req,res){
 	res.render('lobby.ejs' , {"title": "lobby"});
+	//res.redirect('./lobby/roomList/1');
 })
 
 //========================================================================================
