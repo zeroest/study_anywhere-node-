@@ -40,7 +40,8 @@ router.get('/roomList', function(req,res){
 		console.log("in/room : "+row);
 		userrooms = row;
 		res.send(userrooms);
-	});
+	});	
+	//res.redirect('/roomList/1')
 });
 
 
@@ -70,7 +71,7 @@ router.get('/roomList/1', function(req,res){
 			"endPage": endPage
 		}
 		
-		res.render(data);		
+		res.render('/room/roomList.ejs',{ "data" : data });		
 		
 	});
 	

@@ -89,7 +89,7 @@
 			});
             
             //새로고침 메소드
-/*            function refresh(){
+            function refresh(){
                 $.getJSON('/lobby/roomList', function(data){
 				userrooms = data;
 				$.each(data, function(index, item){
@@ -100,9 +100,9 @@
 					}).text('방이름: '+ item.roomname +' 방장: '+                     userid).appendTo('#container');
 				    });
 			    });
-            }*/
+            }
             
-             function refresh(){
+ /*            function refresh(){
                 $.getJSON('/lobby/roomList/1', function(data){
 				userrooms = data.userrooms;
 				$.each(userrooms, function(index, item){
@@ -113,7 +113,7 @@
 					}).text('방이름: '+ item.roomname +' 방장: '+                     item.userid).appendTo('#container');
 				    });
 			    });
-            }
+            }*/
             
 		});
             
@@ -164,7 +164,11 @@
 	
 	<hr>
 	
-	<div id="container"></div>
+	<div id="container">
+	    
+
+	    
+	</div>
     </div>
     
     <!--================================================================================-->
