@@ -23,6 +23,7 @@ router.use(session({
 router.post('/', function(req, res){
 	console.log(req.body.roomname);
 	fs.readFile('views/Canvas.html', 'utf8', function(err, data){
+		if(err) console.log('err'+err);
 		res.send(ejs.render(data,{
 			room: req.body.roomname
 		}));

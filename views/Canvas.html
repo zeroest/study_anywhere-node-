@@ -77,10 +77,18 @@ canvas {
     <script>
     
         $(document).ready(function () {
+        	
+        	if('<%= room %>' == ''){
+        		alert('로그인을 다시해주세요!');
+        		location.href='http://localhost/Study_Anywhere';
+        	}
+        	
         	console.log('<%= room %>');
             // Canvas 객체를 추출합니다.
             var canvas = document.getElementById('canvas');
             var context = canvas.getContext('2d');
+            // 소켓 이벤트를 연결합니다.
+            var socket = io.connect();
 
             // 변수를 선언합니다.
             var width = 5;
@@ -93,6 +101,9 @@ canvas {
                 color = data;
             });
 
+            
+
+            
             // 이벤트를 연결합니다.
             canvas.addEventListener('mousedown', function (event) {
                 isDown = true;
@@ -119,8 +130,7 @@ canvas {
             });
 
 
-            // 소켓 이벤트를 연결합니다.
-            var socket = io.connect();
+
             socket.on('line', function (data) {
                 context.lineWidth = data.width;
                 context.strokeStyle = data.color;
@@ -131,15 +141,7 @@ canvas {
             });
         });
         
-        var del = null;
-        
-        function pen(){
-        	del = false;
-        }
-        
-        function eraser(){
-        	del = true;
-        }
+
         
     </script>
     <style media="screen">
