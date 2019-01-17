@@ -12,7 +12,7 @@ var bodyParser = require('body-parser');
 
 //웹 서버와 소켓 서버를 생성
 var app = express();
-var io = socketio();
+io = socketio();
 var server = require('http').createServer(app);
 //소켓 서버를 웹 서버에 연결
 io.attach(server);
@@ -61,7 +61,6 @@ app.use('/room', roomRouter)
 
 //========================================================================================
 
-var userrooms = [];
 var usernames = [];
 
 io.sockets.on('connect', function(socket){
@@ -79,9 +78,9 @@ io.sockets.on('connect', function(socket){
 		var username = data.username;
 		
 		socket.username = username;
-		socket.room = data.lobby;
+		socket.room = data.roomname;
 		usernames[username] = username;
-		socket.join(data.lobby);
+		socket.join(data.roomname);
 		socket.emit('servernoti', 'green', 'you has connected Chat');
 		
 		var userlist = new Array();	
@@ -92,9 +91,9 @@ io.sockets.on('connect', function(socket){
 		
 		io.sockets.in(socket.room).emit('updateuser', userlist);
 		
-		socket.broadcast.to(data.lobby).emit('servernoti', 'green', username + ' has connected to ' + data.lobby);		
-		if (data.lobby!='lobby')
-			socket.emit('updaterooms', rooms, roomname);
+		socket.broadcast.to(data.roomname).emit('servernoti', 'green', username + ' has connected to ' + data.roomname);		
+//		if (data.roomname!='lobby')
+//			socket.emit('updaterooms', rooms, roomname);
 	});	
 	
 	socket.on('join', function(data){
@@ -116,7 +115,7 @@ io.sockets.on('connect', function(socket){
 				
 				roomId = data;
 				//socket.leave(socket.room);
-				socket.join(data);
+				//socket.join(data);
 				socket.room = data;
 						
 						
@@ -147,8 +146,18 @@ io.sockets.on('connect', function(socket){
 	});
 	
 	socket.on('draw', function(data){
-		io.sockets.in(roomId).emit('line', data);
+		io.sockets.in(socket.room).emit('line', data);
 	});
+	
+	socket.on('clearAll', (data) => {
+		io.sockets.in(socket.room).emit('clearAll', data);
+	});
+	
+	socket.on('joinCanvas', function(data){
+		socket.join(data);
+		socket.room = data;
+	});
+	
 	
 	socket.on('onCreateRoom', function(data){
 		console.log('on server onCreateRoom')
@@ -198,7 +207,7 @@ io.sockets.on('connect', function(socket){
 	socket.on('sendmsg', function (data) {
 		console.log(data.message);
 		console.log(data.mem_ID);
-		io.sockets.in('lobby').emit('recvmsg', data.mem_ID, data.message);
+		io.sockets.in(socket.room).emit('recvmsg', data.mem_ID, data.message);
 	});
 	
 	

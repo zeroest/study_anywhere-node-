@@ -48,7 +48,7 @@ router.get('/roomList/:num', function(req,res){
 		var begin = (pageNum-1)*size;
 		var cnt = userrooms.length;  // 전체 글의 개수
 		var totalPage = Math.ceil(cnt / size);  // 전체 페이지의 수
-		var pageSize = 3; // 페이지 링크의 개수   
+		var pageSize = 10; // 페이지 링크의 개수   
 		    
 		var startPage = Math.floor((pageNum-1)  / pageSize) * pageSize + 1;
 		var endPage = startPage + (pageSize - 1);
@@ -157,6 +157,7 @@ router.get('/logout', function(req,res){
 
 
 //========================================================================================
+
 
 module.exports = router;
 

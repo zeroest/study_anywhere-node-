@@ -18,7 +18,7 @@
 
   <script type="text/javascript">
     var userid = "<%= mem_ID %>";
-    var userrooms = [];
+    var usernames = [];
     var socket = io.connect();
 
 
@@ -242,11 +242,17 @@ function erase() {
 //채팅
 
 socket.on('connect', function(){
+
   socket.emit('guestjoin', {
-    'lobby': 'lobby',
-    'username': userid
+    'roomname': 'lobby',
+    'username': userid,
+    'usernames': JSON.stringify(usernames)
 });
 });
+
+socket.on('disconnect', function(){
+  //delete usern
+})
 
 socket.on('servernoti', function (col, data) {
   $('#conversation').append('<b><font color='+col+'>' + data + '</font></b><br>');
