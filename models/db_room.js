@@ -52,7 +52,7 @@ exports.getList = function(data, callback) {
 		conn.query(sql, function(err, result) {
 			if (err)
 				console.log('err', err);
-			console.log("in getList: " + result);
+			//console.log("in getList: " + result);
 
 			callback(result);
 			conn.release();

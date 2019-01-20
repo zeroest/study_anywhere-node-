@@ -7,6 +7,7 @@ var ejs = require('ejs');
 //========================================================================================
 
 var db_room = require('../models/db_room');
+var db_member = require('../models/db_member');
 
 var router = express.Router();
 
@@ -38,7 +39,7 @@ var userrooms = [];
 router.get('/roomList/:num', function(req,res){
 	//var currentRoom = Object.keys(io.sockets.adapter.rooms).filter(item => item!=io.sockets.id);
 	db_room.getList(userrooms, function(row){
-		console.log("in/room : "+row);
+		//console.log("in/room : "+row);
 		userrooms = row;
 		//res.send(userrooms);
 		
@@ -151,10 +152,57 @@ router.get('/logout', function(req,res){
 	req.session.destroy(function(err){
 		if(err) console.log('err',err);
 	});  // 세션 삭제
+	
+	db_member.delchatlist(req.body.username, function(result){
+		console.log(result);
+	})
+	
 	res.clearCookie('sid'); // 세션 쿠키 삭제
 	res.redirect('http://localhost/Study_Anywhere/memberLogout.do');
 })
 
+
+//========================================================================================
+
+
+router.post('/addchatlist', function(req,res){
+	var username = req.body.username;
+	var roomname = req.body.roomname;
+	
+	console.log(username);
+	console.log(roomname);
+	
+	var data = {
+			'username': username,
+			'roomname': roomname
+	}
+	
+	db_member.addchatlist(data,function(result){
+		console.log(result);
+		
+		res.send(result);
+	})
+})
+
+router.post('/getchatlist', function(req,res){
+	
+	db_member.getchatlist(req.body.roomname ,function(result){
+		console.log(result);
+		
+		res.send(result);
+	})
+})
+
+router.post('/delchatlist', function(req,res){
+	
+	console.log('delchatlist');
+	
+	db_member.delchatlist(req.body.username, function(result){
+		console.log(result);
+		
+		res.send(result);
+	})
+})
 
 //========================================================================================
 

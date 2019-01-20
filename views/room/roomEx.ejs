@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <title><%=title%></title>
   <!-- <script src="//code.jquery.com/jquery-1.12.0.min.js"></script> -->
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="/socket.io/socket.io.js"></script>
 
   <style>
@@ -100,6 +100,9 @@
 <script type="text/javascript">
   var socket = io.connect();
   var usernames = [];
+  var roomname = '<%= roomname %>';
+  var username = '<%= mem_ID %>';
+
 
   $(document).ready(() => {
 
@@ -122,7 +125,14 @@
     });
 
     $("#calendar").click(() => {
-      alert("달력 준비중");
+      var form = document.form1;
+      window.open("", "calendar", "width=700, height=550, top=0, left=0");
+      form.action = "http://localhost/Study_Anywhere/showCalendar.do";
+      form.target = "calendar";
+      form.roomname.value = roomname;
+      form.username.value = username;
+      form.submit();
+
     });
 
 
@@ -135,12 +145,8 @@ socket.on('connect', function(){
     'roomname': '<%= roomname %>',
     'username': '<%= mem_ID %>'
 });
-
-
 });
 
-console.log('<%= roomname %>')
-console.log('<%= mem_ID %>')
     socket.on('servernoti', function (col, data) {
       $('#conversation').append('<b><font color='+col+'>' + data + '</font></b><br>');
       if ($('#scrolldiv').prop('scrollHeight') > $('#scrolldiv').height())
@@ -148,18 +154,28 @@ console.log('<%= mem_ID %>')
     });
 
     socket.on('updateuser', function (usernames) {
-      $('#userlist').empty();
-      $.each(usernames, function (key, value) {
-        $('#userlist').append('<div>' + value + '</div>');
-      });
+      $.ajax({
+        type: 'POST',
+        url: "/lobby/getchatlist",
+        data: {
+          "roomname": roomname
+        },
+        success: function(list) {
+          $('#userlist').empty();
+          $.each(list, function (key, value) {
+            $('#userlist').append('<div>' + value + '</div>');
+          });
+
+        }//success
     });
+  });
 
     socket.on('recvmsg', function (username, data) {
       console.log(username, data);
       $('#conversation').append('<b>'+username + ':</b> ' + data + '<br>');
       if ($('#scrolldiv').prop('scrollHeight') > $('#scrolldiv').height())
         $('#scrolldiv').scrollTop($('#scrolldiv').prop('scrollHeight'));
-    });
+    }); //recvmsg
 
     $(function(){
       $('#data').keypress(function(e) {
@@ -195,7 +211,8 @@ console.log('<%= mem_ID %>')
         <div class="divs" id="board">게시판</div>
         <div class="divs" id="timer">타이머</div>
         <div class="divs" id="calendar">달력</div>
-        <input type="hidden" name="roomname">
+        <input type="hidden" name="roomname" />
+        <input type="hidden" name="username" />
       </form>
       <a href="http://localhost:3000/">로비로 돌아가자</a>
     </div>

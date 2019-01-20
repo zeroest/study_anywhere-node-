@@ -49,9 +49,7 @@ router.post('/identify', function(req, res){
 
 
 router.get('/', function(req,res){
-	console.log('페이지 렌더링 전');
 	res.render('lobby.ejs' , {'mem_ID': req.session.mem_ID });
-	console.log('페이지 렌더링');
 	//res.redirect('./lobby/roomList/1');
 })
 

@@ -18,6 +18,7 @@
 
   <script type="text/javascript">
     var userid = "<%= mem_ID %>";
+    var roomname = "lobby";
     var usernames = [];
     var socket = io.connect();
 
@@ -143,7 +144,7 @@
 
       });
 
-    }
+    }//refresh() end
 
 //============================================================================================
 
@@ -242,17 +243,11 @@ function erase() {
 //채팅
 
 socket.on('connect', function(){
-
   socket.emit('guestjoin', {
     'roomname': 'lobby',
-    'username': userid,
-    'usernames': JSON.stringify(usernames)
+    'username': userid
 });
 });
-
-socket.on('disconnect', function(){
-  //delete usern
-})
 
 socket.on('servernoti', function (col, data) {
   $('#conversation').append('<b><font color='+col+'>' + data + '</font></b><br>');
@@ -261,10 +256,22 @@ socket.on('servernoti', function (col, data) {
 });
 
 socket.on('updateuser', function (usernames) {
-  $('#userlist').empty();
-  $.each(usernames, function (key, value) {
-    $('#userlist').append('<div>' + value + '</div>');
-  });
+  $.ajax({
+    type: 'POST',
+    url: "/lobby/getchatlist",
+    data: {
+      "roomname": roomname
+    },
+    success: function(list) {
+      $('#userlist').empty();
+      $.each(list, function (key, value) {
+        $('#userlist').append('<div>' + value + '</div>');
+      });
+
+    }//success
+  })//$.ajax
+
+
 });
 
 socket.on('recvmsg', function (username, data) {

@@ -35,6 +35,7 @@ var lobbyRouter = require('./routes/lobby');
 var roomRouter = require('./routes/room');
 
 var db_room = require('./models/db_room');
+var db_member = require('./models/db_member');
 
 
 
@@ -76,24 +77,35 @@ io.sockets.on('connect', function(socket){
 	
 	socket.on('guestjoin', function(data){		
 		var username = data.username;
-		
+		var roomname = data.roomname;
 		socket.username = username;
-		socket.room = data.roomname;
-		usernames[username] = username;
-		socket.join(data.roomname);
-		socket.emit('servernoti', 'green', 'you has connected Chat');
+		socket.room = roomname;
+		//usernames[username] = username;
 		
-		var userlist = new Array();	
-		
-		for (var name in usernames) {
-			userlist.push(usernames[name]);
-		}
-		
-		io.sockets.in(socket.room).emit('updateuser', userlist);
-		
-		socket.broadcast.to(data.roomname).emit('servernoti', 'green', username + ' has connected to ' + data.roomname);		
-//		if (data.roomname!='lobby')
-//			socket.emit('updaterooms', rooms, roomname);
+		db_member.addchatlist(data,function(result){
+			
+			//console.log(result);
+			
+			socket.join(data.roomname);
+			socket.emit('servernoti', 'green', 'you has connected Chat');
+			
+			/*var userlist = new Array();	
+			
+			for (var name in usernames) {
+				userlist.push(usernames[name]);
+			}*/
+			
+			db_member.getchatlist(roomname ,function(data){
+				var list = [];
+		          for(var i = 0; i<data.length; i++){
+		            list.push(data[i].member_id);
+		          }
+		          console.log(list);
+		          io.sockets.in(roomname).emit('updateuser', list);
+		          socket.broadcast.to(roomname).emit('servernoti', 'green', username + ' has connected to ' + roomname);		
+			})
+		})
+			
 	});	
 	
 	socket.on('join', function(data){
@@ -145,18 +157,7 @@ io.sockets.on('connect', function(socket){
 		
 	});
 	
-	socket.on('draw', function(data){
-		io.sockets.in(socket.room).emit('line', data);
-	});
-	
-	socket.on('clearAll', (data) => {
-		io.sockets.in(socket.room).emit('clearAll', data);
-	});
-	
-	socket.on('joinCanvas', function(data){
-		socket.join(data);
-		socket.room = data;
-	});
+
 	
 	
 	socket.on('onCreateRoom', function(data){
@@ -213,21 +214,51 @@ io.sockets.on('connect', function(socket){
 	
 	
 	socket.on('disconnect', function(){
-		delete usernames[socket.username];
-		var userlist = new Array();			
-		for (var name in usernames) {
-			userlist.push(usernames[name]);
-		}
-		io.sockets.emit('updateuser', userlist);
-		if(typeof(socket.username) != 'undefined'){
-		socket.broadcast.emit('servernoti', 'red', socket.username + ' has disconnected');
-		}
-		socket.leave(socket.room);
+		//delete usernames[socket.username];
+		console.log(socket.username+"disconnect")
+		
+		var username = socket.username;
+		var roomname = socket.room;
+
+		db_member.delchatlist(username, function(){
+			
+			db_member.getchatlist(roomname, function(list){
+				
+		          io.sockets.emit('updateuser', list);
+		          if(typeof(socket.username) != 'undefined' && username != ''){
+						socket.broadcast.to(roomname).emit('servernoti', 'red', socket.username + ' has disconnected');
+					}
+					socket.leave(socket.room);
+					
+			})
+			
+		});
+		
+			
+	}); //disconnect
+	
+	socket.on('draw', function(data){
+		io.sockets.in(socket.room).emit('line', data);
+	});
+	
+	socket.on('clearAll', (data) => {
+		io.sockets.in(socket.room).emit('clearAll', data);
+	});
+	
+	socket.on('joinCanvas', function(data){
+		socket.join(data);
+		socket.room = data;
+		
+		io.sockets.in(data).emit('getImage', "");
+		socket.on('getImage', (data) => {
+			console.log('image save..........')
+			io.sockets.in(data).emit('setImage', data);
+		});
 		
 	});
 	
 	
-})
+}) // socket end
 
 
 
