@@ -112,7 +112,7 @@
 
       form.action = "http://localhost:3000/room/canvas";
       form.target = "canvas";
-      form.roomname.value = '<%= roomname %>';
+      form.roomname.value = roomname;
       form.submit();
     });
 
@@ -126,12 +126,7 @@
 
     $("#calendar").click(() => {
       var form = document.form1;
-      window.open("", "calendar", "width=700, height=550, top=0, left=0");
-      form.action = "http://localhost/Study_Anywhere/showCalendar.do";
-      form.target = "calendar";
-      form.roomname.value = roomname;
-      form.username.value = username;
-      form.submit();
+      window.open("http://localhost/Study_Anywhere/showCalendar.do", "calendar", "width=700, height=550, top=0, left=0");
 
     });
 
