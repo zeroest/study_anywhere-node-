@@ -79,7 +79,7 @@ exports.roomCheck = function(data, callback) {
 exports.searchRname = function(data, callback) {
 	pool.getConnection(function(err, conn) {
 		if (err) console.log('err', err);
-		var sql = 'select * from room where roomname like "%'+data+'%";';
+		var sql = 'select roomname, userid from room where roomname like "%'+data+'%";';
 		conn.query(sql , function(err, result) {
 			if (err) console.log('err', err);
 			console.log(result);
@@ -94,7 +94,7 @@ exports.searchRname = function(data, callback) {
 exports.searchRid = function(data, callback) {
 	pool.getConnection(function(err, conn) {
 		if (err) console.log('err', err);
-		var sql = 'select * from room where userid like "%'+data+'%";';
+		var sql = 'select roomname, userid from room where userid like "%'+data+'%";';
 		conn.query(sql , function(err, result) {
 			if (err) console.log('err', err);
 			console.log(result);

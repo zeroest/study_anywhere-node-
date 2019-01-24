@@ -45,7 +45,7 @@ router.get('/roomList/:num', function(req,res){
 		
 
 		var pageNum = req.params.num;     
-		var size = 5;  // 한 페이지에 보여줄 개수
+		var size = 8;  // 한 페이지에 보여줄 개수
 		var begin = (pageNum-1)*size;
 		var cnt = userrooms.length;  // 전체 글의 개수
 		var totalPage = Math.ceil(cnt / size);  // 전체 페이지의 수
@@ -80,16 +80,18 @@ router.post('/roomCheck', function(req,res){
 	
 	var rname = req.body.rname;
 	var rpass = req.body.rpass;
+	var chief = req.body.chief;
 	console.log(rname);
 	console.log(rpass);
-	
+	console.log(chief);
 	
 	db_room.roomCheck(rname, function(result){
 		if(result.roompass == rpass){
 			console.log('비번 맞음')
 			res.render('room/roomJoin',{ 
 				"roomname": rname,
-				"mem_ID": req.session.mem_ID
+				"mem_ID": req.session.mem_ID,
+				"chief": chief
 				});
 		}else{
 			res.writeHead(200, {'Content-Type':'text/html; charset=utf-8'});

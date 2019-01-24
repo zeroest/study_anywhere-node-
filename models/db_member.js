@@ -20,8 +20,8 @@ exports.hash = function (id, callback) {
 	  exports.addchatlist = function (data, callback) {
 		  pool.getConnection(function (err, conn) {
 		    if (err) console.log('err', err);
-		    var sql = 'insert into chatlist values( ? , ? );';
-		    conn.query(sql , [data.roomname,data.username], function (err, result) {
+		    var sql = 'insert into chatlist values( ? , ? , ? );';
+		    conn.query(sql , [data.roomname,data.username,data.chief], function (err, result) {
 		      if (err) console.log('err', err);
 		        callback(result);
 		        conn.release();

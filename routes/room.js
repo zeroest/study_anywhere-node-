@@ -3,6 +3,7 @@ var bodyParser = require('body-parser');
 var session = require('express-session');
 var fs = require('fs');
 var ejs = require('ejs');
+var dateFormat = require('dateformat');
 
 //========================================================================================
 
@@ -24,10 +25,12 @@ router.post('/', function(req, res){
 	console.log(req.body.roomname);
 	fs.readFile('views/room/roomEx.ejs', 'utf8', function(err, data){
 		if(err) console.log('err'+err);
+		console.log("chief : "+req.body.chief);
 		res.send(ejs.render(data,{
 			'title': '방방방',
-			'mem_ID': req.body.mem_ID, 
-			'roomname': req.body.roomname
+			'mem_ID': req.body.mem_ID,
+			'roomname': req.body.roomname,
+			'chief': req.body.chief
 		}));
 	});
 });
@@ -38,17 +41,24 @@ router.get('/timer', (req, res) => {
 	});
 });
 
-router.post('/canvas', (req, res) => {
+router.get('/canvas', (req, res) => {
 	fs.readFile('views/room/Canvas.html', 'utf8', function(err, data){
 		res.send(ejs.render(data,{
-			roomname: req.body.roomname
+			roomname: req.query.roomname
 		}));
 	});
 });
 
+router.get('/clock', (req, res) => {
+	
+	var d = new Date();
+	
+	//res.send(dateFormat(d, "dddd, mmmm dS, yyyy, h:MM:ss TT").toString());
+	res.send(d);
+	
+});
 
 //========================================================================================
 
 
 module.exports = router;
-

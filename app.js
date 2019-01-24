@@ -87,7 +87,7 @@ io.sockets.on('connect', function(socket){
 			//console.log(result);
 			
 			socket.join(data.roomname);
-			socket.emit('servernoti', 'green', 'you has connected Chat');
+			socket.emit('servernoti', 'green', '채팅에 연결 되었습니다!');
 			
 			/*var userlist = new Array();	
 			
@@ -102,7 +102,7 @@ io.sockets.on('connect', function(socket){
 		          }
 		          console.log(list);
 		          io.sockets.in(roomname).emit('updateuser', list);
-		          socket.broadcast.to(roomname).emit('servernoti', 'green', username + ' has connected to ' + roomname);		
+		          socket.broadcast.to(roomname).emit('servernoti', 'green', username + ' 님이 ' + roomname + ' 의 방에 입장하였습니다.');		
 			})
 		})
 			
@@ -112,12 +112,12 @@ io.sockets.on('connect', function(socket){
 		console.log('data at join : '+data);
 		
 		db_room.getList(data, function(row){
-			userrooms = row;
+			
 			var result = 0;
 			
 			function wheretogo(){
 				for(var item in userrooms){
-					if(userrooms[item].roomname == data){
+					if(row[item].roomname == data){
 						result+=1;
 					}
 				}
@@ -125,7 +125,7 @@ io.sockets.on('connect', function(socket){
 			
 			if(result != 1){
 				
-				roomId = data;
+				//var roomname = data;
 				//socket.leave(socket.room);
 				//socket.join(data);
 				socket.room = data;
@@ -163,22 +163,9 @@ io.sockets.on('connect', function(socket){
 	socket.on('onCreateRoom', function(data){
 		console.log('on server onCreateRoom')
 		
-		
-		
-		var roomexist = false;
-/*		for(var item in userrooms){
-			if(data.roomname == userrooms[item].roomname){
-				roomexist = true;
-			}
-		}*/
-		
-		db_room.existCheck(data.roomname, function(result){
-			roomexist = result;
-		
-			if(!roomexist){
 				//socket.leave(socket.room);
 				//socket.join(data.roomname);
-				socket.room = data.roomname;
+				//socket.room = data.roomname;
 				data.rcode = 0;
 				
 				var room = {
@@ -187,20 +174,14 @@ io.sockets.on('connect', function(socket){
 						roompass: data.roompass,
 					};
 				
+				console.log(data.userid)
+				
 				db_room.createRoom(room, function(row){
 					console.log(row);
 				});
-				
-			}else{
-				data.rcode = 1;
-			}
-			
-			if(data.rcode == 0){
-			socket.emit('onCreateRoom', data)
-			}else{
-				console.log('기존 방있음');
-			}
-		})
+		
+				//socket.emit('join', room.roomname);
+			socket.emit('onCreateRoom', room);
 	});
 	
 	
@@ -226,7 +207,7 @@ io.sockets.on('connect', function(socket){
 				
 		          io.sockets.emit('updateuser', list);
 		          if(typeof(socket.username) != 'undefined' && username != ''){
-						socket.broadcast.to(roomname).emit('servernoti', 'red', socket.username + ' has disconnected');
+						socket.broadcast.to(roomname).emit('servernoti', 'red', socket.username + ' 님이 나갔습니다.');
 					}
 					socket.leave(socket.room);
 					
