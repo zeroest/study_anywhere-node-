@@ -20,7 +20,7 @@ io.attach(server);
 //서버 실행
 var port = 3000;
 server.listen(port, function(){
-	console.log('server running at http://localhost:'+port);
+	console.log('server running at http://'+url+':'+port);
 });
 
 //========================================================================================
@@ -63,6 +63,10 @@ app.use('/room', roomRouter)
 //========================================================================================
 
 var usernames = [];
+
+//===========================
+var url = 'localhost';
+//===========================
 
 io.sockets.on('connect', function(socket){
 	var roomId = "";
@@ -131,7 +135,7 @@ io.sockets.on('connect', function(socket){
 				socket.room = data;
 						
 						
-				var destination = 'http://localhost:3000/room';
+				var destination = 'http://'+url+':3000/room';
 				var redirect ={
 					"bool": true,
 					"method": "POST",
@@ -143,7 +147,7 @@ io.sockets.on('connect', function(socket){
 				
 				console.log('오류발생 ');
 				
-				var destination = 'http://localhost:3000';
+				var destination = 'http://'+url+':3000';
 				var redirect ={
 						"bool": false,
 						"method": "GET",
@@ -197,6 +201,7 @@ io.sockets.on('connect', function(socket){
 	socket.on('disconnect', function(){
 		//delete usernames[socket.username];
 		console.log(socket.username+"disconnect")
+		
 		
 		var username = socket.username;
 		var roomname = socket.room;

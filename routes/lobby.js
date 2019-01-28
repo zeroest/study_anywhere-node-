@@ -21,7 +21,9 @@ router.use(session({
 
 var userrooms = [];
 
-
+//==========================
+var url = 'localhost';
+//==========================
 
 
 
@@ -95,7 +97,7 @@ router.post('/roomCheck', function(req,res){
 				});
 		}else{
 			res.writeHead(200, {'Content-Type':'text/html; charset=utf-8'});
-			res.end('<script>alert("비밀번호가 일치하지 않습니다"); window.location="http://localhost:3000/";</script>')
+			res.end('<script>alert("비밀번호가 일치하지 않습니다"); window.location="http://'+url+':3000/";</script>')
 		}
 	})
 });
@@ -160,7 +162,7 @@ router.get('/logout', function(req,res){
 	})
 	
 	res.clearCookie('sid'); // 세션 쿠키 삭제
-	res.redirect('http://localhost/Study_Anywhere/memberLogout.do');
+	res.redirect('http://'+url+'/Study_Anywhere/memberLogout.do');
 })
 
 

@@ -18,6 +18,8 @@ router.use(session({
 	 saveUninitialized: true
 }));
 
+
+
 //========================================================================================
 
 
@@ -25,9 +27,8 @@ router.post('/', function(req, res){
 	console.log(req.body.roomname);
 	fs.readFile('views/room/roomEx.ejs', 'utf8', function(err, data){
 		if(err) console.log('err'+err);
-		console.log("chief : "+req.body.chief);
 		res.send(ejs.render(data,{
-			'title': '방방방',
+			'title': '스터디룸',
 			'mem_ID': req.body.mem_ID,
 			'roomname': req.body.roomname,
 			'chief': req.body.chief

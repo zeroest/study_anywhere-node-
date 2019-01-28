@@ -13,6 +13,9 @@ var db_room = require('../models/db_room');
 
 var router = express.Router();
 
+//=========================
+var url = 'localhost';
+//=========================
 
 //========================================================================================
 
@@ -37,10 +40,10 @@ router.post('/identify', function(req, res){
 		
 		if(nodehash == sess.mem_Hash){
 			console.log('Right')
-			res.redirect('http://localhost:3000/');
+			res.redirect('http://'+url+':3000/');
 		}else {
 			res.writeHead(200, {'Content-Type':'text/html; charset=utf-8'});
-			res.end('<script>alert("인증도중 오류가 발생하였습니다."); window.location="http://localhost/Study_Anywhere/";</script>')
+			res.end('<script>alert("인증도중 오류가 발생하였습니다."); window.location="http://'+url+'/Study_Anywhere/";</script>')
 		}
 		
 	});

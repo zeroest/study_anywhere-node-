@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Bootstrap Example</title>
+  <title>Study_Anywhere</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
@@ -49,6 +49,10 @@
   <script src='/fullcalendar/lang/ko.js'></script>
 <script type="text/javascript">
 
+//=========================
+var url = 'localhost';
+//=========================
+
 var roomname = '<%= roomname %>';
 var username = '<%= mem_ID %>';
 var chief = '<%= chief %>';
@@ -58,11 +62,18 @@ console.log(username);
 
 var events_array = [];
 
+$(document).ready(function(){
+  if(username == ''){
+    alert('로그인을 다시해주세요');
+    location.href="http://"+url+"/Study_Anywhere/memberLogout.do"
+  }
+})
+
 
 //getAll =================================
 $.ajax({
     type: 'POST',
-    url: "http://localhost/Study_Anywhere/getAllEvent.do",
+    url: "http://"+url+"/Study_Anywhere/getAllEvent.do",
     data:{
     	"roomname": roomname
     },
@@ -134,7 +145,7 @@ $.ajax({
                       console.log(data);
                       $.ajax({
                           type: 'GET',
-                          url: "http://localhost/Study_Anywhere/modifyEvent.do",
+                          url: "http://"+url+"/Study_Anywhere/modifyEvent.do",
                           data: {
                             "event": JSON.stringify(data),
                           },
@@ -176,7 +187,7 @@ $.ajax({
                   console.log(data);
                   $.ajax({
                       type: 'GET',
-                      url: "http://localhost/Study_Anywhere/modifyEvent.do",
+                      url: "http://"+url+"/Study_Anywhere/modifyEvent.do",
                       data: {
                         "event": JSON.stringify(data),
                       },
@@ -230,7 +241,7 @@ $.ajax({
 
                                 $.ajax({
                                     type: 'POST',
-                                    url: "http://localhost/Study_Anywhere/removeEvent.do",
+                                    url: "http://"+url+"/Study_Anywhere/removeEvent.do",
                                     data: {
                                       "event": JSON.stringify(data),
                                     },
@@ -280,7 +291,7 @@ $.ajax({
 
             $.ajax({
               type: 'POST',
-              url: "http://localhost/Study_Anywhere/addEvent.do",
+              url: "http://"+url+"/Study_Anywhere/addEvent.do",
               data: {
                 "event": JSON.stringify(data),
               },
@@ -335,7 +346,7 @@ $.ajax({
 
     	            $.ajax({
     	                type: 'GET',
-    	                url: "http://localhost/Study_Anywhere/modifyEvent.do",
+    	                url: "http://"+url+"/Study_Anywhere/modifyEvent.do",
     	                data: {
     	                  "event": JSON.stringify(data),
     	                },
@@ -384,7 +395,7 @@ $.ajax({
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="http://localhost/Study_Anywhere">Study Anywhere</a>
+        <a class="navbar-brand" href="http://"+url+"/Study_Anywhere">Study Anywhere</a>
 
       </div>
       <div class="collapse navbar-collapse" id="myNavbar">
@@ -397,9 +408,15 @@ $.ajax({
         </ul>
    -->      <ul class="nav navbar-nav navbar-right">
 
+   <script>
 
+     function goMyPage (){
+       location.href='http://'+url+'/Study_Anywhere/myPage.jsp'
+     }
 
-  		<li><a href="./memberDetail.do"><span class="glyphicon glyphicon-log-in"></span> My page</a></li>
+   </script>
+
+  		<li><a onclick="goMyPage()" style="cursor:pointer"><span class="glyphicon glyphicon-log-in"></span> My page</a></li>
       <li><a href="/lobby/logout"><span class="glyphicon glyphicon-log-out"></span> Sign out</a>
 
         </ul>
@@ -410,16 +427,36 @@ $.ajax({
 <script type="text/javascript">
 
   function calen(){
-    window.open('http://localhost/Study_Anywhere/showCalendar.do', 'calendar', 'width=700, height=550, top=0, left=0');
+    window.open('http://'+url+'/Study_Anywhere/showCalendar.do', 'calendar', 'width=700, height=550, top=0, left=0');
   }
 
   function timer(){
-    window.open("http://localhost:3000/room/timer", "timer", "width=335, height=150, top=605, left=-10");
+    window.open("http://"+url+":3000/room/timer", "timer", "width=335, height=150, top=605, left=-10");
   };
 
   function canvas(){
-    window.open("http://localhost:3000/room/canvas?roomname="+roomname, "canvas", "width=720, height=415");
+    window.open("http://"+url+":3000/room/canvas?roomname="+roomname, "canvas", "width=720, height=415");
   }
+
+  function bbs(rname){
+    window.open('http://'+url+'/Study_Anywhere/boardList.do?page=1', 'calendar', 'width=700, height=750, top=0, left=0');
+  }
+
+  function search(){
+    var key = $('#search').val();
+    window.open("https://search.naver.com/search.naver?query="+key);
+  }
+
+$(function(){
+  $('#search').keypress(function(e) {
+    if(e.which == 13) {
+      $(this).blur();
+      var key = $('#search').val();
+      window.open("https://search.naver.com/search.naver?query="+key);
+      $('#search').val('');
+    }
+  });
+});
 </script>
 
 
@@ -430,7 +467,7 @@ $.ajax({
         <li class="active" style="cursor: pointer;"><a onClick="calen()">캘린더</a></li>
         <li class="active" style="cursor: pointer;"><a onClick="timer()">타이머</a></li>
         <li class="active" style="cursor: pointer;"><a onClick="canvas()">캔버스</a></li>
-        <li class="active" style="cursor: pointer;"><a onClick="">게시판</a></li>
+        <li class="active" style="cursor: pointer;"><a onClick="bbs()">게시판</a></li>
       </ul>
     </div>
     <div class="col-sm-7 text-left">
@@ -445,6 +482,8 @@ $.ajax({
         <p style="display: inline-block; width:500px; height:50px; line-height:0px; color:#666;font-size:30px; text-align:center;" id="day"></p>
         <p style="display: inline-block; width:500px; height:50px; line-height:0px; color:#666;font-size:80px; text-align:center;" id="clock"></p>
         </div>
+
+         <input type="text" id="search" style="width: 300px;">&nbsp;&nbsp;<span class="glyphicon glyphicon-search" style="cursor:pointer" onclick="search()"></span>
 
       </div>
       <br>
@@ -560,7 +599,7 @@ setInterval(clock1, 1000);
       var form = document.form1;
       window.open("", "canvas", "width=720, height=415");
 
-      form.action = "http://localhost:3000/room/canvas";
+      form.action = "http://"+url+":3000/room/canvas";
       form.target = "canvas";
       form.roomname.value = roomname;
       form.submit();
@@ -571,14 +610,8 @@ setInterval(clock1, 1000);
     });
 
     $("#timer").click(() => {
-      window.open("http://localhost:3000/room/timer", "timer", "width=335, height=150, top=605, left=-10");
+      window.open("http://"+url+":3000/room/timer", "timer", "width=335, height=150, top=605, left=-10");
     });
-
-    // $("#calendar").click(() => {
-    //   var form = document.form1;
-    //   window.open("http://localhost/Study_Anywhere/showCalendar.do", "calendar", "width=700, height=550, top=0, left=0");
-    //
-    // });
 
 
     });
