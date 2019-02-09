@@ -39,6 +39,10 @@
       }
       .row.content {height:auto;}
     }
+
+    th{
+      text-align: center;
+    }
   </style>
 
   <link rel='stylesheet' href='/fullcalendar/fullcalendar.css' />
@@ -50,7 +54,7 @@
 <script type="text/javascript">
 
 //=========================
-var url = 'localhost';
+var url = '54.180.100.17';
 //=========================
 
 var roomname = '<%= roomname %>';
@@ -65,15 +69,18 @@ var events_array = [];
 $(document).ready(function(){
   if(username == ''){
     alert('로그인을 다시해주세요');
-    location.href="http://"+url+"/Study_Anywhere/memberLogout.do"
+    location.href="http://"+url+":8080/Study_Anywhere/memberLogout.do"
   }
 })
+
+
+
 
 
 //getAll =================================
 $.ajax({
     type: 'POST',
-    url: "http://"+url+"/Study_Anywhere/getAllEvent.do",
+    url: "http://"+url+":8080/Study_Anywhere/getAllEvent.do",
     data:{
     	"roomname": roomname
     },
@@ -112,6 +119,38 @@ $.ajax({
   $(document).ready(function() {
 
 
+      $.ajax({
+        type:'POST',
+        url: 'http://'+url+':8080/Study_Anywhere/getBoardFive.do',
+        data:{
+          'roomname': roomname
+        },
+        success:function(data){
+          var list = eval(data);
+          console.log(list);
+          if(list.length == 0){
+            $('<h2 style="margin-top: 70px;"></h2>').text('게시물을 작성해주세요!').appendTo('#ifEmptyBoard');
+          }
+
+          for(var i in list){
+            var title = list[i].board_subject
+      if((list[i].board_subject).length > 20){
+        title = (list[i].board_subject).substring(0,19);
+        title += '.....';
+      }
+      $('<tr></tr>').attr('id',list[i].board_num).appendTo('#tbody');
+      $('<td></td>').text(list[i].board_num).appendTo('#'+list[i].board_num+'');
+      $('<td></td>').text(title).appendTo('#'+list[i].board_num+'');
+      $('<td></td>').text(list[i].member_id).appendTo('#'+list[i].board_num+'');
+      $('<td></td>').text(list[i].board_readcount).appendTo('#'+list[i].board_num+'');
+      $('<td></td>').text(list[i].comment_count).appendTo('#'+list[i].board_num+'');
+
+
+    }
+
+        }
+      })
+
 
 
 
@@ -145,7 +184,7 @@ $.ajax({
                       console.log(data);
                       $.ajax({
                           type: 'GET',
-                          url: "http://"+url+"/Study_Anywhere/modifyEvent.do",
+                          url: "http://"+url+":8080/Study_Anywhere/modifyEvent.do",
                           data: {
                             "event": JSON.stringify(data),
                           },
@@ -187,7 +226,7 @@ $.ajax({
                   console.log(data);
                   $.ajax({
                       type: 'GET',
-                      url: "http://"+url+"/Study_Anywhere/modifyEvent.do",
+                      url: "http://"+url+":8080/Study_Anywhere/modifyEvent.do",
                       data: {
                         "event": JSON.stringify(data),
                       },
@@ -241,7 +280,7 @@ $.ajax({
 
                                 $.ajax({
                                     type: 'POST',
-                                    url: "http://"+url+"/Study_Anywhere/removeEvent.do",
+                                    url: "http://"+url+":8080/Study_Anywhere/removeEvent.do",
                                     data: {
                                       "event": JSON.stringify(data),
                                     },
@@ -291,7 +330,7 @@ $.ajax({
 
             $.ajax({
               type: 'POST',
-              url: "http://"+url+"/Study_Anywhere/addEvent.do",
+              url: "http://"+url+":8080/Study_Anywhere/addEvent.do",
               data: {
                 "event": JSON.stringify(data),
               },
@@ -346,7 +385,7 @@ $.ajax({
 
     	            $.ajax({
     	                type: 'GET',
-    	                url: "http://"+url+"/Study_Anywhere/modifyEvent.do",
+    	                url: "http://"+url+":8080/Study_Anywhere/modifyEvent.do",
     	                data: {
     	                  "event": JSON.stringify(data),
     	                },
@@ -395,7 +434,9 @@ $.ajax({
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="http://"+url+"/Study_Anywhere">Study Anywhere</a>
+
+        <a id="navbrand" class="navbar-brand">Study Anywhere</a>
+        <script> $('#navbrand').attr('href','http://'+url+':8080/Study_Anywhere/') </script>
 
       </div>
       <div class="collapse navbar-collapse" id="myNavbar">
@@ -411,7 +452,7 @@ $.ajax({
    <script>
 
      function goMyPage (){
-       location.href='http://'+url+'/Study_Anywhere/myPage.jsp'
+       location.href='http://'+url+':8080/Study_Anywhere/myPage.jsp'
      }
 
    </script>
@@ -427,7 +468,7 @@ $.ajax({
 <script type="text/javascript">
 
   function calen(){
-    window.open('http://'+url+'/Study_Anywhere/showCalendar.do', 'calendar', 'width=700, height=550, top=0, left=0');
+    window.open('http://'+url+':8080/Study_Anywhere/showCalendar.do', 'calendar', 'width=700, height=550, top=0, left=0');
   }
 
   function timer(){
@@ -435,11 +476,11 @@ $.ajax({
   };
 
   function canvas(){
-    window.open("http://"+url+":3000/room/canvas?roomname="+roomname, "canvas", "width=720, height=415");
+    window.open("http://"+url+":3000/room/canvas?roomname="+roomname, "canvas", "width=930, height=630");
   }
 
   function bbs(rname){
-    window.open('http://'+url+'/Study_Anywhere/boardList.do?page=1', 'calendar', 'width=700, height=750, top=0, left=0');
+    window.open('http://'+url+':8080/Study_Anywhere/boardList.do?page=1', 'calendar', 'width=800, height=750, top=0, left=0');
   }
 
   function search(){
@@ -457,12 +498,20 @@ $(function(){
     }
   });
 });
+
+
 </script>
 
 
 <div class="container-fluid text-center">
   <div class="row content">
     <div class="col-sm-2 sidenav">
+      <div class="row" style="text-align: center">
+        <h1 style=" display: inline; text-align: center;"><%= roomname %></h1><h3 style="display: inline;">에</h3>
+        <h3 style=" text-align: center;">오신것을 환영합니다!</h3>
+
+        <br>
+      </div>
       <ul class="nav nav-pills nav-stacked">
         <li class="active" style="cursor: pointer;"><a onClick="calen()">캘린더</a></li>
         <li class="active" style="cursor: pointer;"><a onClick="timer()">타이머</a></li>
@@ -472,21 +521,45 @@ $(function(){
     </div>
     <div class="col-sm-7 text-left">
 
-      <div class="row" style="text-align: center">
-        <h1 style=" text-align: center;"><%= roomname %></h1>
-        <h3 style=" text-align: center;">에 오신것을 환영합니다!</h3>
-        <hr style="border: 1px solid gray">
-        <br>
 
-        <div class="">
-        <p style="display: inline-block; width:500px; height:50px; line-height:0px; color:#666;font-size:30px; text-align:center;" id="day"></p>
-        <p style="display: inline-block; width:500px; height:50px; line-height:0px; color:#666;font-size:80px; text-align:center;" id="clock"></p>
+
+
+
+
+
+
+      <div class="row" style="text-align: center;">
+
+        <div class="col-sm-6" style="margin-top: 110px;  margin-bottom: 50px;">
+        <p style="display: inline; width:400px; height:50px; line-height:0px; color:#666;font-size:20px; text-align:center;" id="day"></p> <br /><br /><br />
+        <p style="display: inline; width:400px; height:50px; line-height:0px; color:#666;font-size:70px; text-align:center; " id="clock"></p><br /><br />
+        <input type="text" id="search" style="width: 200px; margin-left: 10px" placeholder="검색어를 입력해 주세요!">&nbsp;&nbsp;<span class="glyphicon glyphicon-search" style="cursor:pointer" onclick="search()"></span>
         </div>
 
-         <input type="text" id="search" style="width: 300px;">&nbsp;&nbsp;<span class="glyphicon glyphicon-search" style="cursor:pointer" onclick="search()"></span>
+<div class="container-fluid" >
+  <br />
+  <h3>최신 게시물</h3>
+  <div class="table-responsive">
+  <table class="table table-bordered table-striped table-hover " style="height: 200px; font-size: 12px;">
+    <thead class="thead-dark text-center">
+      <tr>
+			<th>번호</th>
+			<th style="width: 200px">제목</th>
+			<th>작성자</th>
+			<th>조회수</th>
+			<th>댓글수</th>
+			<!-- <th>좋아요</th> -->
+			</tr>
+    </thead>
+    <tbody id="tbody">
+
+    </tbody>
+  </table>
+  <div id="ifEmptyBoard"></div>
+  </div>
+</div>
 
       </div>
-      <br>
       <hr style="border: 1px solid gray">
       <!--================================================================================-->
 
@@ -505,7 +578,7 @@ $(function(){
               </div>
               <div >
                 <input id="data" style="width:80%; overflow:hidden;" />
-                <input type="button" id="datasend" value="send" />
+                <input class="btn btn-sm btn-primary" type="button" id="datasend" value="보내기" />
               </div>
 
               </div>

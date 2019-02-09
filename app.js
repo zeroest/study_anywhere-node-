@@ -65,12 +65,12 @@ app.use('/room', roomRouter)
 var usernames = [];
 
 //===========================
-var url = 'localhost';
+var url = '54.180.100.17';
 //===========================
 
 io.sockets.on('connect', function(socket){
 	var roomId = "";
-	
+
 /*	var userroom = {
 			userid: string,
 			roomname: string,
@@ -78,27 +78,27 @@ io.sockets.on('connect', function(socket){
 			roommaxp: int,
 			roomcurp: int
 	}*/
-	
-	socket.on('guestjoin', function(data){		
+
+	socket.on('guestjoin', function(data){
 		var username = data.username;
 		var roomname = data.roomname;
 		socket.username = username;
 		socket.room = roomname;
 		//usernames[username] = username;
-		
+
 		db_member.addchatlist(data,function(result){
-			
+
 			//console.log(result);
-			
+
 			socket.join(data.roomname);
 			socket.emit('servernoti', 'green', '채팅에 연결 되었습니다!');
-			
-			/*var userlist = new Array();	
-			
+
+			/*var userlist = new Array();
+
 			for (var name in usernames) {
 				userlist.push(usernames[name]);
 			}*/
-			
+
 			db_member.getchatlist(roomname ,function(data){
 				var list = [];
 		          for(var i = 0; i<data.length; i++){
@@ -106,19 +106,19 @@ io.sockets.on('connect', function(socket){
 		          }
 		          console.log(list);
 		          io.sockets.in(roomname).emit('updateuser', list);
-		          socket.broadcast.to(roomname).emit('servernoti', 'green', username + ' 님이 ' + roomname + ' 의 방에 입장하였습니다.');		
+		          socket.broadcast.to(roomname).emit('servernoti', 'green', username + ' 님이 ' + roomname + ' 의 방에 입장하였습니다.');
 			})
 		})
-			
-	});	
-	
+
+	});
+
 	socket.on('join', function(data){
 		console.log('data at join : '+data);
-		
+
 		db_room.getList(data, function(row){
-			
+
 			var result = 0;
-			
+
 			function wheretogo(){
 				for(var item in userrooms){
 					if(row[item].roomname == data){
@@ -126,15 +126,15 @@ io.sockets.on('connect', function(socket){
 					}
 				}
 			}
-			
+
 			if(result != 1){
-				
+
 				//var roomname = data;
 				//socket.leave(socket.room);
 				//socket.join(data);
 				socket.room = data;
-						
-						
+
+
 				var destination = 'http://'+url+':3000/room';
 				var redirect ={
 					"bool": true,
@@ -142,11 +142,11 @@ io.sockets.on('connect', function(socket){
 					"destination": destination
 				}
 				socket.emit('redirect', redirect);
-				
+
 			}else{
-				
+
 				console.log('오류발생 ');
-				
+
 				var destination = 'http://'+url+':3000';
 				var redirect ={
 						"bool": false,
@@ -154,96 +154,97 @@ io.sockets.on('connect', function(socket){
 						"destination": destination
 				}
 				socket.emit('redirect', redirect);
-				
-			}
-			
-		});
-		
-	});
-	
 
-	
-	
+			}
+
+		});
+
+	});
+
+
+
+
 	socket.on('onCreateRoom', function(data){
 		console.log('on server onCreateRoom')
-		
+
 				//socket.leave(socket.room);
 				//socket.join(data.roomname);
 				//socket.room = data.roomname;
 				data.rcode = 0;
-				
+
 				var room = {
 						userid: data.userid,
 						roomname: data.roomname,
 						roompass: data.roompass,
 					};
-				
+
 				console.log(data.userid)
-				
+
 				db_room.createRoom(room, function(row){
 					console.log(row);
 				});
-		
+
 				//socket.emit('join', room.roomname);
 			socket.emit('onCreateRoom', room);
 	});
-	
-	
-	
+
+
+
 	socket.on('sendmsg', function (data) {
 		console.log(data.message);
 		console.log(data.mem_ID);
 		io.sockets.in(socket.room).emit('recvmsg', data.mem_ID, data.message);
 	});
-	
-	
-	
+
+
+
 	socket.on('disconnect', function(){
 		//delete usernames[socket.username];
 		console.log(socket.username+"disconnect")
-		
-		
+
+
 		var username = socket.username;
 		var roomname = socket.room;
 
 		db_member.delchatlist(username, function(){
-			
+
 			db_member.getchatlist(roomname, function(list){
-				
+
 		          io.sockets.emit('updateuser', list);
 		          if(typeof(socket.username) != 'undefined' && username != ''){
 						socket.broadcast.to(roomname).emit('servernoti', 'red', socket.username + ' 님이 나갔습니다.');
 					}
 					socket.leave(socket.room);
-					
+
 			})
-			
+
 		});
-		
-			
+
+
 	}); //disconnect
-	
+
 	socket.on('draw', function(data){
 		io.sockets.in(socket.room).emit('line', data);
 	});
-	
+
 	socket.on('clearAll', (data) => {
 		io.sockets.in(socket.room).emit('clearAll', data);
 	});
-	
+
 	socket.on('joinCanvas', function(data){
 		socket.join(data);
 		socket.room = data;
-		
+
 		io.sockets.in(data).emit('getImage', "");
-		socket.on('getImage', (data) => {
-			console.log('image save..........')
-			io.sockets.in(data).emit('setImage', data);
-		});
-		
+	      socket.on('getImage', (data) => {
+	         console.log('image save..........')
+	         console.log(socket.room);
+	         io.sockets.in(socket.room).emit('setImage', data);
+	      });
+
 	});
-	
-	
+
+
 }) // socket end
 
 

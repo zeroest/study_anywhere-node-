@@ -48,7 +48,7 @@ exports.getList = function(data, callback) {
 	pool.getConnection(function(err, conn) {
 		if (err)
 			console.log('err', err);
-		var sql = 'select * from room;';
+		var sql = 'select * from room order by indata desc;';
 		conn.query(sql, function(err, result) {
 			if (err)
 				console.log('err', err);

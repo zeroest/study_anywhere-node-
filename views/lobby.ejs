@@ -31,7 +31,7 @@
   <script type="text/javascript">
 
     //===================================
-    var url = 'localhost';
+    var url = '54.180.100.17';
     //===================================
 
 
@@ -75,10 +75,7 @@
                 'data-toggle': "modal",
                 'data-target': "#enterRoom",
                 'style': "cursor: pointer;"
-              }).appendTo('#num'+index+'');
-
-              $('<p></p>').text('방이름: ' + item.roomname).appendTo('#'+item.roomname+'');
-              $('<p></p>').text('방장: ' + item.userid).appendTo('#'+item.roomname+'');
+              }).appendTo('#num'+index+'').append($('<p></p>').text('방이름: ' + item.roomname)).append($('<p></p>').text('방장: ' + item.userid));
 
             })
           }
@@ -95,85 +92,94 @@
       $('#container').empty();
       $('#paging').empty();
 
-      $.getJSON('/lobby/roomList/' + j, function(data) {
-        userrooms = data.userrooms;
+      $.ajax({
+        type: 'get',
+        url: '/lobby/roomList/',
+        data:{
+          'num': j
+        },
+        success: function(obj){
+          var data = eval(obj);
 
-        var end = data.begin + data.size;
-        if (end > data.cnt) {
-          end = data.cnt
-        }
+          userrooms = data.userrooms;
 
-//방목록 출력
-        for (var i = data.begin; i < end; i++) {
-          //console.log(i)
-          $('<div id="num'+i+'" class="col-sm-3"></div>').appendTo('#container');
-          $('<div class="well"></div>').attr({
-            'id': userrooms[i].roomname,
-            'chief': userrooms[i].userid,
-            'data-toggle': "modal",
-            'data-target': "#enterRoom",
-            'style': "cursor: pointer;"
-          }).appendTo('#num'+i+'');
-
-          $('<p></p>').text('방이름: ' + userrooms[i].roomname).appendTo('#'+userrooms[i].roomname+'');
-          $('<p></p>').text('방장: ' + userrooms[i].userid).appendTo('#'+userrooms[i].roomname+'');
-}
-
-//============================================================================================
-//방목록 밑단 버튼 출력
-
-        if (j > 1) {
-          $('<a></a>').attr({
-            onclick: 'refresh(1)',
-            style: 'cursor: pointer'
-          }).text("1[◀◀]").appendTo('#paging');
-          $('<a></a>').attr({
-            onclick: 'refresh(' + (j - 1) + ')',
-            style: 'cursor: pointer'
-          }).text("[◀]").appendTo('#paging');
-        } else {
-          $('<span></span>').attr({
-            style: 'color: gray'
-          }).text("[◀◀]").appendTo('#paging');
-          $('<span></span>').attr({
-            style: 'color: gray'
-          }).text("[◀]").appendTo('#paging');
-        }
-
-        for (var i = data.startPage; i <= data.endPage; i++) {
-          if (i == j) {
-            $('<span></span>').text('<' + i + '>').appendTo('#paging');
-          } else {
-
-            $('<a></a>').attr({
-              onclick: 'refresh(' + i + ')',
-              style: 'cursor: pointer'
-
-            }).text('<' + i + '>').appendTo('#paging');
+          var end = data.begin + data.size;
+          if (end > data.cnt) {
+            end = data.cnt
           }
+
+  //방목록 출력
+          for (var i = data.begin; i < end; i++) {
+            //console.log(i)
+            $('<div id="num'+i+'" class="col-sm-3"></div>').appendTo('#container');
+            $('<div class="well"></div>').attr({
+              'id': userrooms[i].roomname,
+              'chief': userrooms[i].userid,
+              'data-toggle': "modal",
+              'data-target': "#enterRoom",
+              'style': "cursor: pointer;"
+            }).appendTo('#num'+i+'').append($('<p></p>').text('방이름: ' + userrooms[i].roomname)).append($('<p></p>').text('방장: ' + userrooms[i].userid));
+
+  }
+
+  //============================================================================================
+  //방목록 밑단 버튼 출력
+
+          if (j > 1) {
+            $('<a></a>').attr({
+              onclick: 'refresh(1)',
+              style: 'cursor: pointer'
+            }).text("1[◀◀]").appendTo('#paging');
+            $('<a></a>').attr({
+              onclick: 'refresh(' + (j - 1) + ')',
+              style: 'cursor: pointer'
+            }).text("[◀]").appendTo('#paging');
+          } else {
+            $('<span></span>').attr({
+              style: 'color: gray'
+            }).text("[◀◀]").appendTo('#paging');
+            $('<span></span>').attr({
+              style: 'color: gray'
+            }).text("[◀]").appendTo('#paging');
+          }
+
+          for (var i = data.startPage; i <= data.endPage; i++) {
+            if (i == j) {
+              $('<span></span>').text('<' + i + '>').appendTo('#paging');
+            } else {
+
+              $('<a></a>').attr({
+                onclick: 'refresh(' + i + ')',
+                style: 'cursor: pointer'
+
+              }).text('<' + i + '>').appendTo('#paging');
+            }
+          }
+
+
+          if (j < data.totalPage) {
+            $('<a></a>').attr({
+              onclick: 'refresh(' + (j + 1) + ')',
+              style: 'cursor: pointer'
+            }).text("[▶]").appendTo('#paging');
+            $('<a></a>').attr({
+              onclick: 'refresh(' + data.totalPage + ')',
+              style: 'cursor: pointer'
+            }).text("[▶▶]" + data.totalPage).appendTo('#paging');
+
+          } else {
+            $('<span></span>').attr({
+              style: 'color: gray'
+            }).text("[▶▶]").appendTo('#paging');
+            $('<span></span>').attr({
+              style: 'color: gray'
+            }).text("[▶]").appendTo('#paging');
+          }
+
+
         }
+      })
 
-
-        if (j < data.totalPage) {
-          $('<a></a>').attr({
-            onclick: 'refresh(' + (j + 1) + ')',
-            style: 'cursor: pointer'
-          }).text("[▶]").appendTo('#paging');
-          $('<a></a>').attr({
-            onclick: 'refresh(' + data.totalPage + ')',
-            style: 'cursor: pointer'
-          }).text("[▶▶]" + data.totalPage).appendTo('#paging');
-
-        } else {
-          $('<span></span>').attr({
-            style: 'color: gray'
-          }).text("[▶▶]").appendTo('#paging');
-          $('<span></span>').attr({
-            style: 'color: gray'
-          }).text("[▶]").appendTo('#paging');
-        }
-
-      });
 
     }//refresh() end
 
@@ -181,24 +187,10 @@
 
     $(document).ready(function() {
 
-  /*    function checkSpecial(str) {
-        var pattern_num = /[0-9]/;	// 숫자
-var pattern_eng = /[a-zA-Z]/;	// 문자
-var pattern_spc = /[~!@#$%^&*()_+|<>?:{}]/; // 특수문자
-var pattern_kor = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/; // 한글체크
-
-if( !(pattern_spc.test(str)) ){
-  return true
-}else{
-  alert("ggggggg")
-  return false
-}
-}*/
-
 
       if(userid == ''){
         alert('로그인을 다시해주세요');
-        location.href="http://"+url+"/Study_Anywhere/memberLogout.do"
+        location.href="http://"+url+":8080/Study_Anywhere/memberLogout.do"
       }
 
 
@@ -215,10 +207,8 @@ if( !(pattern_spc.test(str)) ){
           'data-toggle': "modal",
           'data-target': "#enterRoom",
           'style': "cursor: pointer;"
-        }).appendTo('#'+data.roomname+'1');
+        }).appendTo('#'+data.roomname+'1').append($('<p></p>').text('방이름: ' + data.roomname)).append($('<p></p>').text('방장: ' + data.userid));
 
-        $('<p></p>').text('방이름: ' + data.roomname).appendTo('#'+data.roomname+'');
-        $('<p></p>').text('방장: ' + data.userid).appendTo('#'+data.roomname+'');
 
       });
 
@@ -266,13 +256,7 @@ if( !(pattern_spc.test(str)) ){
         if (roomPass == '' || roomName == '') {
           alert('이름과 비밀번호를 입력해주세요.');
           return;
-        }else if(!regExp1(roomName) || !regExp1(roomPass)){
-          alert('특수문자는 입력이 불가합니다.')
-          return;
-        }else if(!regExp2(roomName) || !regExp2(roomPass)){
-          alert('공백을 입력하실 수 없습니다.')
-          return;
-        }  else {
+        }else {
           $.ajax({
             type: 'GET',
             url: "/lobby/existCheck",
@@ -403,7 +387,8 @@ $(function(){
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="http://"+url+"/Study_Anywhere">Study Anywhere</a>
+        <a id="navbrand" class="navbar-brand">Study Anywhere</a>
+        <script> $('#navbrand').attr('href','http://'+url+':8080/Study_Anywhere/') </script>
 
       </div>
       <div class="collapse navbar-collapse" id="myNavbar">
@@ -419,7 +404,7 @@ $(function(){
 <script>
 
   function goMyPage (){
-    location.href='http://'+url+'/Study_Anywhere/myPage.jsp'
+    location.href='http://'+url+':8080/Study_Anywhere/myPage.jsp'
   }
 
 </script>
